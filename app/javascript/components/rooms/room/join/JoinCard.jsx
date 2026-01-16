@@ -25,7 +25,7 @@ import {
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { VideoCameraIcon } from '@heroicons/react/24/outline';
+import { VideoCameraIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import usePublicRoom from '../../../../hooks/queries/rooms/usePublicRoom';
 import { useAuth } from '../../../../contexts/auth/AuthProvider';
 import useRoomStatus from '../../../../hooks/mutations/rooms/useRoomStatus';
@@ -205,6 +205,60 @@ export default function JoinCard() {
     fields.accessCode.label = t('room.settings.mod_access_code_optional');
   }
 
+  function downloadCalendarFile() {
+    const room = publicRoom?.data;
+    if (!room?.scheduled_start_time || !friendlyId) {
+      toast.error(t('room.settings.no_schedule'));
+      return;
+    }
+
+    const startDate = new Date(room.scheduled_start_time).toISOString().replace(/[-:]/g, '').split('.')[0];
+    const dtstamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
+    const created = dtstamp;
+    const lastModified = dtstamp;
+    const joinUrl = `${window.location.origin}${window.location.pathname}`.replace(/\/+/g, '/');
+    // Use room owner email or fallback for organizer
+    const organizerEmail = room?.owner_email || 'noreply@greenlight';
+    
+    let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//BigBlueButton//Greenlight//EN
+BEGIN:VEVENT
+UID:${friendlyId}@greenlight
+DTSTAMP:${dtstamp}Z
+CREATED:${created}Z
+LAST-MODIFIED:${lastModified}Z
+SUMMARY:${room?.name || 'Meeting'}
+DESCRIPTION:Join the meeting at: ${joinUrl}
+ORGANIZER;CN=${room?.owner_name || 'Organizer'}:mailto:${organizerEmail}
+DTSTART:${startDate}Z`;
+
+    // Calculate end time based on duration
+    if (room?.meeting_duration_minutes && room.meeting_duration_minutes > 0) {
+      const endTime = new Date(room.scheduled_start_time);
+      endTime.setMinutes(endTime.getMinutes() + room.meeting_duration_minutes);
+      const endDate = endTime.toISOString().replace(/[-:]/g, '').split('.')[0];
+      icsContent += `\nDTEND:${endDate}Z`;
+    }
+
+    // Add recurrence rule if specified
+    if (room?.recurrence_rule) {
+      icsContent += `\nRRULE:${room.recurrence_rule}`;
+    }
+
+    icsContent += `\nEND:VEVENT
+END:VCALENDAR`;
+
+    const element = document.createElement('a');
+    element.setAttribute('href', `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`);
+    element.setAttribute('download', `${room?.name || 'meeting'}.ics`);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    toast.success(t('toast.success.room.calendar_downloaded'));
+  }
+
   const WaitingPage = (
     <Stack direction="horizontal" className="py-4">
       <div>
@@ -227,15 +281,27 @@ export default function JoinCard() {
             <h1 className="mt-2">
               {publicRoom?.data.name}
             </h1>
-            { (recordValue !== 'false') && recordings?.data?.length > 0 && (
-              <ButtonLink
-                variant="brand-outline"
-                className="mt-3 mb-0 cursor-pointer"
-                to={`/rooms/${friendlyId}/public_recordings`}
-              >
-                <span> <VideoCameraIcon className="hi-s text-brand" /> {t('view_recordings')} </span>
-              </ButtonLink>
-            )}
+            <Stack direction="horizontal" gap={2} className="mt-3">
+              { (recordValue !== 'false') && recordings?.data?.length > 0 && (
+                <ButtonLink
+                  variant="brand-outline"
+                  className="mb-0 cursor-pointer"
+                  to={`/rooms/${friendlyId}/public_recordings`}
+                >
+                  <span> <VideoCameraIcon className="hi-s text-brand" /> {t('view_recordings')} </span>
+                </ButtonLink>
+              )}
+              {publicRoom?.data?.scheduled_start_time && (
+                <Button
+                  variant="brand-outline"
+                  className="mb-0"
+                  onClick={downloadCalendarFile}
+                >
+                  <ArrowDownTrayIcon className="hi-s me-1" />
+                  {t('room.download_calendar_file')}
+                </Button>
+              )}
+            </Stack>
           </Col>
           <Col>
             <Stack direction="vertical" gap={3}>

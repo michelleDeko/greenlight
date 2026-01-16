@@ -36,6 +36,7 @@ import UnshareRoom from './UnshareRoom';
 import useServerTags from '../../../../hooks/queries/rooms/useServerTags';
 import useServerTagsFallbackMode from '../../../../hooks/queries/rooms/useServerTagsFallbackMode';
 import ServerTagRow from './ServerTagRow';
+import MeetingTimeSettings from './MeetingTimeSettings';
 
 export default function RoomSettings() {
   const { t } = useTranslation();
@@ -84,6 +85,7 @@ export default function RoomSettings() {
             </Col>
             <Col className="ps-4">
               <Row> <h6 className="text-brand">{ t('room.settings.user_settings') }</h6> </Row>
+              {friendlyId && friendlyId !== 'undefined' && room && <MeetingTimeSettings friendlyId={friendlyId} room={room} />}
               {(currentUser?.permissions?.CanRecord === 'true') && (
                 <RoomSettingsRow
                   settingName="record"

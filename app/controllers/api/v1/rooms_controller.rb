@@ -16,12 +16,17 @@
 
 # frozen_string_literal: true
 
+require 'icalendar'
+
 module Api
   module V1
     class RoomsController < ApiController
       skip_before_action :ensure_authenticated, only: %i[public_show public_recordings]
+      skip_before_action :ensure_valid_request, only: %i[calendar]
 
-      before_action :find_room, only: %i[show update destroy recordings recordings_processing purge_presentation public_show public_recordings]
+      before_action :find_room,
+                    only: %i[show update destroy recordings recordings_processing purge_presentation
+                             public_show public_recordings calendar]
 
       before_action only: %i[create] do
         ensure_authorized('CreateRoom')
@@ -29,7 +34,7 @@ module Api
       before_action only: %i[create] do
         ensure_authorized('ManageUsers', user_id: room_params[:user_id])
       end
-      before_action only: %i[show update recordings recordings_processing purge_presentation] do
+      before_action only: %i[show update recordings recordings_processing purge_presentation calendar] do
         ensure_authorized(%w[ManageRooms SharedRoom], friendly_id: params[:friendly_id])
       end
       before_action only: %i[destroy] do
@@ -153,14 +158,60 @@ module Api
         render_data data: @room.recordings_processing, status: :ok
       end
 
+      # GET /api/v1/rooms/:friendly_id/calendar.ics
+      # Returns the room calendar in ICS format
+      def calendar
+        ics_content = generate_ics(@room)
+        send_data ics_content,
+                  type: 'text/calendar; charset=utf-8',
+                  filename: "#{@room.name.parameterize}-#{Time.zone.today}.ics"
+      end
+
       private
 
       def find_room
         @room = Room.find_by!(friendly_id: params[:friendly_id])
       end
 
+      def generate_ics(room)
+        return '' if room.scheduled_start_time.blank?
+
+        cal = Icalendar::Calendar.new
+        cal.version = '2.0'
+        cal.prodid = '-//BigBlueButton//Greenlight//EN'
+
+        join_url = "#{request.base_url}/rooms/#{room.friendly_id}/join"
+        description = "Join the meeting at: #{join_url}"
+
+        event = Icalendar::Event.new
+        event.uid = "#{room.friendly_id}@greenlight"
+        event.dtstamp = Time.now.utc
+        event.created = Time.now.utc
+        event.last_modified = Time.now.utc
+        event.summary = room.name
+        event.description = description
+        event.dtstart = room.scheduled_start_time.to_datetime
+        event.dtend = (room.scheduled_start_time + room.meeting_duration_minutes.minutes).to_datetime if room.meeting_duration_minutes.present?
+        event.location = ''
+
+        # Add organizer if current_user is available
+        if current_user&.email.present?
+          event.organizer = "mailto:#{current_user.email}"
+        else
+          # Fallback organizer using room owner's email or a generic one
+          organizer_email = room.user&.email || 'noreply@greenlight'
+          event.organizer = "mailto:#{organizer_email}"
+        end
+
+        # Add recurrence rule if specified
+        event.rrule = room.recurrence_rule if room.recurrence_rule.present?
+
+        cal.add_event(event)
+        cal.to_ical
+      end
+
       def room_params
-        params.require(:room).permit(:name, :user_id, :presentation)
+        params.require(:room).permit(:name, :user_id, :presentation, :scheduled_start_time, :meeting_duration_minutes, :recurrence_rule)
       end
     end
   end

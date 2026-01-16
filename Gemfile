@@ -18,6 +18,7 @@ gem 'dotenv-rails', '>= 3.0.0'
 gem 'google-cloud-storage', '~> 1.44', require: false
 gem 'hcaptcha'
 gem 'i18n-language-mapping'
+gem 'icalendar', '~> 2.8'
 gem 'image_processing', '~> 1.2'
 gem 'jbuilder', '>= 2.12'
 gem 'jsbundling-rails', '>= 1.3.0'

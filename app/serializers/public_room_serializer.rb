@@ -20,7 +20,8 @@ class PublicRoomSerializer < ApplicationSerializer
   include Avatarable
 
   attributes :name, :recording_consent, :require_authentication, :viewer_access_code, :moderator_access_code,
-             :anyone_join_as_moderator, :friendly_id, :owner_name, :owner_id, :owner_avatar, :shared_user_ids
+             :anyone_join_as_moderator, :friendly_id, :owner_name, :owner_id, :owner_avatar, :owner_email,
+             :shared_user_ids, :scheduled_start_time, :meeting_duration_minutes, :recurrence_rule
 
   def recording_consent
     @instance_options[:options][:settings]['record']
@@ -52,6 +53,10 @@ class PublicRoomSerializer < ApplicationSerializer
 
   def owner_avatar
     user_avatar(object.user)
+  end
+
+  def owner_email
+    object.user.email
   end
 
   def shared_user_ids

@@ -30,6 +30,7 @@ class Room < ApplicationRecord
   validates :name, presence: true
   validates :friendly_id, presence: true, uniqueness: true
   validates :meeting_id, presence: true, uniqueness: true
+  validates :meeting_duration_minutes, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
   validates :presentation,
             content_type: Rails.configuration.uploads[:presentations][:formats],
             size: { less_than: Rails.configuration.uploads[:presentations][:max_size] }

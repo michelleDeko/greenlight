@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_09_153256) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_16_132107) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -85,9 +85,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_09_153256) do
     t.string "record_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "visibility", null: false
-    t.integer "length", null: false
-    t.integer "participants", null: false
+    t.string "visibility", default: "published", null: false
+    t.integer "length", default: 0, null: false
+    t.integer "participants", default: 0, null: false
     t.boolean "protectable"
     t.datetime "recorded_at"
     t.index ["room_id"], name: "index_recordings_on_room_id"
@@ -132,6 +132,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_09_153256) do
     t.datetime "updated_at", null: false
     t.integer "recordings_processing", default: 0
     t.boolean "online", default: false
+    t.datetime "scheduled_start_time"
+    t.integer "meeting_duration_minutes", default: 0
+    t.string "recurrence_rule"
     t.index ["friendly_id"], name: "index_rooms_on_friendly_id", unique: true
     t.index ["meeting_id"], name: "index_rooms_on_meeting_id", unique: true
     t.index ["user_id"], name: "index_rooms_on_user_id"
@@ -192,7 +195,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_09_153256) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "role_id"
-    t.string "language", null: false
+    t.string "language", default: "en", null: false
     t.string "reset_digest"
     t.datetime "reset_sent_at"
     t.boolean "verified", default: false

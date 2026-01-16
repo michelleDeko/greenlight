@@ -28,6 +28,9 @@ Rails.application.routes.draw do
   # Health checks
   get '/health_check', to: 'health_checks#check'
 
+  # Calendar routes (public calendar files)
+  get '/rooms/:friendly_id/calendar', to: 'api/v1/rooms#calendar', format: :ics
+
   # All the Api endpoints must be under /api/v1 and must have an extension .json.
   namespace :api do
     namespace :v1 do
@@ -48,6 +51,7 @@ Rails.application.routes.draw do
           get '/public_recordings', to: 'rooms#public_recordings'
           get '/recordings_processing', to: 'rooms#recordings_processing'
           get '/public', to: 'rooms#public_show'
+          get '/calendar', to: 'rooms#calendar'
           delete :purge_presentation
         end
       end
@@ -132,6 +136,6 @@ Rails.application.routes.draw do
 
 
   match '*path', to: 'components#index', via: :all, constraints: lambda { |req|
-    req.path.exclude? 'rails/active_storage'
+    req.path.exclude?('rails/active_storage') && !req.path.end_with?('/calendar.ics')
   } # Enable CSR for full fledged http requests.
 end

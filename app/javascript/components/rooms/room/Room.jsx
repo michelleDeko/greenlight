@@ -19,7 +19,7 @@ import {
   Stack, Button, Col, Row, Dropdown,
 } from 'react-bootstrap';
 import { Link, useParams } from 'react-router-dom';
-import { HomeIcon, Square2StackIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, Square2StackIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../contexts/auth/AuthProvider';
@@ -56,6 +56,58 @@ export default function Room() {
       navigator.clipboard.writeText(`${window.location}/join`);
       toast.success(t('toast.success.room.copied_meeting_url'));
     }
+  }
+
+  function downloadCalendarFile() {
+    if (!room?.scheduled_start_time || !friendlyId) {
+      toast.error(t('room.settings.no_schedule'));
+      return;
+    }
+
+    const startDate = new Date(room.scheduled_start_time).toISOString().replace(/[-:]/g, '').split('.')[0];
+    const dtstamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
+    const created = dtstamp;
+    const lastModified = dtstamp;
+    const joinUrl = `${window.location.origin}${window.location.pathname}/join`.replace(/\/+/g, '/');
+    const organizerEmail = currentUser?.email || 'noreply@greenlight';
+    
+    let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//BigBlueButton//Greenlight//EN
+BEGIN:VEVENT
+UID:${friendlyId}@greenlight
+DTSTAMP:${dtstamp}Z
+CREATED:${created}Z
+LAST-MODIFIED:${lastModified}Z
+SUMMARY:${room?.name || 'Meeting'}
+DESCRIPTION:Join the meeting at: ${joinUrl}
+ORGANIZER;CN=${room?.name || 'Organizer'}:mailto:${organizerEmail}
+DTSTART:${startDate}Z`;
+
+    // Calculate end time based on duration
+    if (room?.meeting_duration_minutes && room.meeting_duration_minutes > 0) {
+      const endTime = new Date(room.scheduled_start_time);
+      endTime.setMinutes(endTime.getMinutes() + room.meeting_duration_minutes);
+      const endDate = endTime.toISOString().replace(/[-:]/g, '').split('.')[0];
+      icsContent += `\nDTEND:${endDate}Z`;
+    }
+
+    // Add recurrence rule if specified
+    if (room?.recurrence_rule) {
+      icsContent += `\nRRULE:${room.recurrence_rule}`;
+    }
+
+    icsContent += `\nEND:VEVENT
+END:VCALENDAR`;
+
+    const element = document.createElement('a');
+    element.setAttribute('href', `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`);
+    element.setAttribute('download', `${room?.name}.ics`);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    toast.success(t('toast.success.room.calendar_downloaded'));
   }
 
   return (
@@ -109,6 +161,15 @@ export default function Room() {
                   ) : (
                     t('room.meeting.start_meeting')
                   )}
+                </Button>
+
+                <Button
+                  variant="brand-outline"
+                  className="mt-1 mx-2 float-end"
+                  onClick={downloadCalendarFile}
+                >
+                  <ArrowDownTrayIcon className="hi-s me-1" />
+                  { t('room.download_calendar_file') }
                 </Button>
 
                 <Dropdown className="btn-group mt-1 mx-2 float-end pb-5">
