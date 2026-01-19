@@ -168,7 +168,19 @@
       "default_tag_name": "Standard",
       "server_tag_desired": "Erwünscht",
       "server_tag_required": "Notwendig",
-      "are_you_sure_delete_room": "Diesen Raum wirklich löschen?"
+      "are_you_sure_delete_room": "Diesen Raum wirklich löschen?",
+      "meeting_schedule": "Meeting-Planung",
+      "start_date": "Startdatum",
+      "start_time": "Startzeit",
+      "duration": "Dauer",
+      "minutes": "Minuten",
+      "no_schedule": "Kein Zeitplan festgelegt",
+      "recurrence": "Wiederholung",
+      "recurrence_none": "Keine Wiederholung",
+      "recurrence_daily": "Täglich",
+      "recurrence_weekly": "Wöchentlich",
+      "recurrence_monthly": "Monatlich",
+      "recurrence_yearly": "Jährlich"
     }
   },
   "recording": {
@@ -419,7 +431,9 @@
         "access_code_deleted": "Zugriffcode wurde gelöscht.",
         "copied_meeting_url": "Die URL der Konferenz wurde kopiert. Der Link kann verwendet werden, um an der Konferenz teilzunehmen.",
         "copied_viewer_code": "Zugangscode für Zuhörende wurde in die Zwischenablage kopiert.",
-        "copied_moderator_code": "Zugangscode für Moderation wurde in die Zwischenablage kopiert."
+        "copied_moderator_code": "Zugangscode für Moderation wurde in die Zwischenablage kopiert.",
+        "calendar_downloaded": "Die Kalenderdatei wurde heruntergeladen.",
+        "meeting_time_updated": "Der Meeting Termin wurde aktualisiert."
       },
       "site_settings": {
         "site_setting_updated": "Grundeinstellungen aktualisiert.",
