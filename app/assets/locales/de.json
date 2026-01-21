@@ -30,6 +30,7 @@
   "join_session": "Sitzung beitreten",
   "no_result_search_input": "Es konnten keine Ergebnisse für \"{{ searchInput }}\" gefunden werden",
   "action_permanent": "Diese Aktion kann nicht rückgängig gemacht werden.",
+  "calendar_file_description": "Tritt dieser Konferenz mit folgendem Link bei: {{ joinUrl }}",
   "homepage": {
     "welcome_bbb": "Willkommen in BigBlueButton.",
     "bigbluebutton_description": "BigBlueButton ist ein Open-Source-Webkonferenzsystem für Online-Kurse. Die Plattform optimiert das Lernen, indem sie es ermöglicht, zusammenzuarbeiten und Feedback in Echtzeit zu erhalten.",

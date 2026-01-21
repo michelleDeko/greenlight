@@ -68,8 +68,10 @@ export default function Room() {
     const dtstamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
     const created = dtstamp;
     const lastModified = dtstamp;
-    const joinUrl = `${window.location.origin}${window.location.pathname}/join`.replace(/\/+/g, '/');
+    const joinUrl = `${window.location.origin}${window.location.pathname}/join`.replace(/([^:]\/)\/+/g, '$1');
     const organizerEmail = currentUser?.email || 'noreply@greenlight';
+    const descriptionText = t('calendar_file_description').replace('{{ joinUrl }}', '').trim();
+    const description = `${descriptionText} ${joinUrl}`.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
     
     let icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
@@ -80,7 +82,7 @@ DTSTAMP:${dtstamp}Z
 CREATED:${created}Z
 LAST-MODIFIED:${lastModified}Z
 SUMMARY:${room?.name || 'Meeting'}
-DESCRIPTION:Join the meeting at: ${joinUrl}
+DESCRIPTION:${description}
 ORGANIZER;CN=${room?.name || 'Organizer'}:mailto:${organizerEmail}
 DTSTART:${startDate}Z`;
 

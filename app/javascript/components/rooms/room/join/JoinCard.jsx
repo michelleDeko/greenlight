@@ -216,9 +216,11 @@ export default function JoinCard() {
     const dtstamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
     const created = dtstamp;
     const lastModified = dtstamp;
-    const joinUrl = `${window.location.origin}${window.location.pathname}`.replace(/\/+/g, '/');
+    const joinUrl = `${window.location.origin}${window.location.pathname}`.replace(/([^:]\/)\/+/g, '$1');
     // Use room owner email or fallback for organizer
     const organizerEmail = room?.owner_email || 'noreply@greenlight';
+    const descriptionText = t('calendar_file_description').replace('{{ joinUrl }}', '').trim();
+    const description = `${descriptionText} ${joinUrl}`.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
     
     let icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
@@ -229,7 +231,7 @@ DTSTAMP:${dtstamp}Z
 CREATED:${created}Z
 LAST-MODIFIED:${lastModified}Z
 SUMMARY:${room?.name || 'Meeting'}
-DESCRIPTION:Join the meeting at: ${joinUrl}
+DESCRIPTION:${description}
 ORGANIZER;CN=${room?.owner_name || 'Organizer'}:mailto:${organizerEmail}
 DTSTART:${startDate}Z`;
 
