@@ -163,14 +163,16 @@ END:VCALENDAR`;
                   )}
                 </Button>
 
-                <Button
-                  variant="brand-outline"
-                  className="mt-1 mx-2 float-end"
-                  onClick={downloadCalendarFile}
-                >
-                  <ArrowDownTrayIcon className="hi-s me-1" />
-                  { t('room.download_calendar_file') }
-                </Button>
+                {room?.scheduled_start_time && (
+                  <Button
+                    variant="brand-outline"
+                    className="mt-1 mx-2 float-end"
+                    onClick={downloadCalendarFile}
+                  >
+                    <ArrowDownTrayIcon className="hi-s me-1" />
+                    { t('room.download_calendar_file') }
+                  </Button>
+                )}
 
                 <Dropdown className="btn-group mt-1 mx-2 float-end pb-5">
                   <Button variant="brand-outline" type="button" className="btn dropdown-main" onClick={() => copyInvite()}>
