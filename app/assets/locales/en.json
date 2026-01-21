@@ -121,7 +121,7 @@
     "search_not_found": "No Rooms Found",
     "rooms_list_is_empty": "You don't have any rooms yet!",
     "rooms_list_empty_create_room": "Create your first room by clicking on the button below and entering a room name.",
-    "download_calendar_file": "Download calendar file (ICS)",
+    "download_calendar_file": "Add to Calendar",
     "meeting": {
       "start_meeting": "Start Meeting",
       "join_meeting": "Join Meeting",

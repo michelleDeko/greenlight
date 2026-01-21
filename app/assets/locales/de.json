@@ -121,6 +121,7 @@
     "search_not_found": "Keine Räume gefunden",
     "rooms_list_is_empty": "Du hast noch keine Räume!",
     "rooms_list_empty_create_room": "Erstelle deinen ersten Raum, indem du auf die Schaltfläche unten klickst und einen Raumnamen eingibst.",
+    "download_calendar_file": "Zum Kalender hinzufügen",
     "meeting": {
       "start_meeting": "Konferenz starten",
       "join_meeting": "Konferenz beitreten",

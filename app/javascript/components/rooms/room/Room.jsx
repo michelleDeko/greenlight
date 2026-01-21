@@ -19,7 +19,7 @@ import {
   Stack, Button, Col, Row, Dropdown,
 } from 'react-bootstrap';
 import { Link, useParams } from 'react-router-dom';
-import { HomeIcon, Square2StackIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, Square2StackIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../contexts/auth/AuthProvider';
@@ -171,7 +171,7 @@ END:VCALENDAR`;
                     className="mt-1 mx-2 float-end"
                     onClick={downloadCalendarFile}
                   >
-                    <ArrowDownTrayIcon className="hi-s me-1" />
+                    <CalendarDaysIcon className="hi-s me-1" />
                     { t('room.download_calendar_file') }
                   </Button>
                 )}

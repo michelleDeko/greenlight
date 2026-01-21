@@ -25,7 +25,7 @@ import {
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { VideoCameraIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { VideoCameraIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 import usePublicRoom from '../../../../hooks/queries/rooms/usePublicRoom';
 import { useAuth } from '../../../../contexts/auth/AuthProvider';
 import useRoomStatus from '../../../../hooks/mutations/rooms/useRoomStatus';
@@ -299,7 +299,7 @@ END:VCALENDAR`;
                   className="mb-0"
                   onClick={downloadCalendarFile}
                 >
-                  <ArrowDownTrayIcon className="hi-s me-1" />
+                  <CalendarDaysIcon className="hi-s me-1" />
                   {t('room.download_calendar_file')}
                 </Button>
               )}
