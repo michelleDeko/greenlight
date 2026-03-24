@@ -22,6 +22,7 @@ import Popover from 'react-bootstrap/Popover';
 import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import useCopyRecordingUrl from '../../hooks/mutations/recordings/useCopyRecordingUrl';
+import { getCustomFormatColor, isStandardFormat } from '../../helpers/ColorHelper';
 
 const CopyRecordingPopover = forwardRef(({
   recording, formats, onCopied, ...popoverProps
@@ -33,18 +34,24 @@ const CopyRecordingPopover = forwardRef(({
     <Popover id="popover-basic" ref={ref} {...popoverProps}>
       <Popover.Header as="h3">{t('recording.copy_recording_urls')}</Popover.Header>
       <Popover.Body>
-        {recording?.visibility !== 'Unpublished' && formats?.map((format) => (
-          <Button
-            onClick={() => copyRecordingUrl.mutate(
-              { record_id: recording.record_id, format: format.recording_type },
-              { onSuccess: () => onCopied() },
-            )}
-            className={`btn-sm rounded-pill me-1 mt-1 border-0 btn-format-${format.recording_type.toLowerCase()}`}
-            key={`${format.recording_type}-${format.url}`}
-          >
-            {format.recording_type}
-          </Button>
-        ))}
+        {recording?.visibility !== 'Unpublished' && formats?.map((format) => {
+          const isStandard = isStandardFormat(format.recording_type);
+          const customColor = !isStandard ? getCustomFormatColor(format.recording_type) : null;
+          const style = customColor ? { backgroundColor: customColor.bg, color: customColor.fg } : {};
+          return (
+            <Button
+              onClick={() => copyRecordingUrl.mutate(
+                { record_id: recording.record_id, format: format.recording_type },
+                { onSuccess: () => onCopied() },
+              )}
+              className={`btn-sm rounded-pill me-1 mt-1 border-0 btn-format-${format.recording_type.toLowerCase()}`}
+              key={`${format.recording_type}-${format.url}`}
+              style={style}
+            >
+              {format.recording_type}
+            </Button>
+          );
+        })}
       </Popover.Body>
     </Popover>
   );

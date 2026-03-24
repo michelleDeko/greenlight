@@ -28,6 +28,7 @@ import { useAuth } from '../../../../contexts/auth/AuthProvider';
 import { localizeDateTimeString } from '../../../../helpers/DateTimeHelper';
 import useRedirectRecordingUrl from '../../../../hooks/mutations/recordings/useRedirectRecordingUrl';
 import CopyRecordingPopover from '../../../recordings/CopyRecordingPopover';
+import { getCustomFormatColor, isStandardFormat } from '../../../../helpers/ColorHelper';
 
 // TODO: Amir - Refactor this.
 export default function PublicRecordingRow({
@@ -59,15 +60,21 @@ export default function PublicRecordingRow({
       </td>
       <td className="border-0"> {t('recording.length_in_minutes', { recording })} </td>
       <td className="border-0">
-        {formats.map((format) => (
-          <Button
-            onClick={() => redirectRecordingUrl.mutate({ record_id: recording.record_id, format: format.recording_type })}
-            className={`btn-sm rounded-pill me-1 mt-1 border-0 btn-format-${format.recording_type.toLowerCase()}`}
-            key={`${format.recording_type}-${recording.record_id}`}
-          >
-            {format.recording_type}
-          </Button>
-        ))}
+        {formats.map((format) => {
+          const isStandard = isStandardFormat(format.recording_type);
+          const customColor = !isStandard ? getCustomFormatColor(format.recording_type) : null;
+          const style = customColor ? { backgroundColor: customColor.bg, color: customColor.fg } : {};
+          return (
+            <Button
+              onClick={() => redirectRecordingUrl.mutate({ record_id: recording.record_id, format: format.recording_type })}
+              className={`btn-sm rounded-pill me-1 mt-1 border-0 btn-format-${format.recording_type.toLowerCase()}`}
+              key={`${format.recording_type}-${recording.record_id}`}
+              style={style}
+            >
+              {format.recording_type}
+            </Button>
+          );
+        })}
       </td>
       <td className="border-start-0">
         <Stack direction="horizontal" className="float-end recordings-icons">

@@ -34,6 +34,7 @@ import { localizeDateTimeString } from '../../helpers/DateTimeHelper';
 import useRedirectRecordingUrl from '../../hooks/mutations/recordings/useRedirectRecordingUrl';
 import SimpleSelect from '../shared_components/utilities/SimpleSelect';
 import CopyRecordingPopover from './CopyRecordingPopover';
+import { getCustomFormatColor, isStandardFormat } from '../../helpers/ColorHelper';
 
 // TODO: Amir - Refactor this.
 export default function RecordingRow({
@@ -212,15 +213,21 @@ export default function RecordingRow({
         </SimpleSelect>
       </td>
       <td className="border-0">
-        {recording?.visibility !== 'Unpublished' && formats.map((format) => (
-          <Button
-            onClick={() => redirectRecordingUrl.mutate({ record_id: recording.record_id, format: format.recording_type })}
-            className={`btn-sm rounded-pill me-1 mt-1 border-0 btn-format-${format.recording_type.toLowerCase()}`}
-            key={`${format.recording_type}-${format.url}`}
-          >
-            {format.recording_type}
-          </Button>
-        ))}
+        {recording?.visibility !== 'Unpublished' && formats.map((format) => {
+          const isStandard = isStandardFormat(format.recording_type);
+          const customColor = !isStandard ? getCustomFormatColor(format.recording_type) : null;
+          const style = customColor ? { backgroundColor: customColor.bg, color: customColor.fg } : {};
+          return (
+            <Button
+              onClick={() => redirectRecordingUrl.mutate({ record_id: recording.record_id, format: format.recording_type })}
+              className={`btn-sm rounded-pill me-1 mt-1 border-0 btn-format-${format.recording_type.toLowerCase()}`}
+              key={`${format.recording_type}-${format.url}`}
+              style={style}
+            >
+              {format.recording_type}
+            </Button>
+          );
+        })}
       </td>
       <td className="border-start-0">
         <Stack direction="horizontal" className="float-end recordings-icons">
